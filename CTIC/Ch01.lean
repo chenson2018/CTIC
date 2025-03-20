@@ -6,9 +6,12 @@ import Mathlib.Algebra.Category.Ring.Basic
 
 open CategoryTheory
 
+-- I'm not extremely carful with these
+universe u v u' v'
+
 -- example 1.1.10
 open Function in
-lemma bijective_iff_iso {X Y : Type} (f : X → Y) : Bijective f ↔ @IsIso Type _ _ _ f := by
+lemma bijective_iff_iso {X Y : Type u} (f : X → Y) : Bijective f ↔ @IsIso (Type u) _ _ _ f := by
   apply Iff.intro <;> intros h 
   case mp =>
     -- there's weirdness about the defeq of the bundling, but this is the idea...
@@ -33,7 +36,7 @@ lemma bijective_iff_iso {X Y : Type} (f : X → Y) : Bijective f ↔ @IsIso Type
       exact congrFun r
 
 -- exercise 1.1.i.i
-lemma iso_unique (C : Type) [Category C] (X Y : C) (α α' : Iso X Y) (h : α.hom = α'.hom) : α.inv = α'.inv := by
+lemma iso_unique (C : Type u) [Category C] (X Y : C) (α α' : Iso X Y) (h : α.hom = α'.hom) : α.inv = α'.inv := by
   obtain ⟨f , g , l , r ⟩ := α
   obtain ⟨f', g', l', r'⟩ := α'
   simp_all
@@ -46,7 +49,7 @@ lemma iso_unique (C : Type) [Category C] (X Y : C) (α α' : Iso X Y) (h : α.ho
     _ = g'            := Category.id_comp g'
 
 -- exercise 1.1.i.ii
-lemma inverses_eq (C : Type) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶  X) (H : f ≫  g = 𝟙 X) (H' : h ≫ f = 𝟙 Y) : g = h := by
+lemma inverses_eq (C : Type u) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶  X) (H : f ≫  g = 𝟙 X) (H' : h ≫ f = 𝟙 Y) : g = h := by
   calc
     g = 𝟙 Y ≫ g     := Eq.symm (Category.id_comp g)
     _ = (h ≫ f) ≫ g := by rw [H']
@@ -54,18 +57,18 @@ lemma inverses_eq (C : Type) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶ 
     _ = h ≫ 𝟙 X     := by rw [H]
     _ = h           := Category.comp_id h
 
-lemma inverses_iso (C : Type) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶  X) (H : f ≫  g = 𝟙 X) (H' : h ≫ f = 𝟙 Y) : IsIso f := by
+lemma inverses_iso (C : Type u) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶  X) (H : f ≫  g = 𝟙 X) (H' : h ≫ f = 𝟙 Y) : IsIso f := by
   exists h
   rw [inverses_eq C X Y f g h H H'] at H
   exact ⟨H, H'⟩
 
 section isocomp
 
-variable {α : Type} [C : Category α] {x y : α} (f : x ⟶  y)
+variable {C : Type u} [Category C] {x y : C} (f : x ⟶  y)
 
 -- lemma 1.2.3
 -- chance to try duality....
-lemma iso_postcomp : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ h : c ⟶  x ↦ h ≫ f)) := by
+lemma iso_postcomp : IsIso f ↔ (∀ c, @IsIso (Type u) _ _ _ (λ h : c ⟶  x ↦ h ≫ f)) := by
   apply Iff.intro <;> intros h
   case mp =>
     have ⟨g, ⟨l, r⟩⟩ := h
@@ -75,25 +78,22 @@ lemma iso_postcomp : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ h : c ⟶  x ↦ 
   case mpr => 
     sorry
 
-lemma iso_precomp  : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ g : y ⟶  c ↦ f ≫ g)) := sorry
+lemma iso_precomp  : IsIso f ↔ (∀ c, @IsIso (Type u) _ _ _ (λ g : y ⟶  c ↦ f ≫ g)) := sorry
 
 -- exercise 1.2.ii
 -- book states this as surjective, but I think easier (since in Set/Type) to use equivalent Epi
-lemma split_epi_postcomp  : IsSplitEpi  f ↔  (∀ c, @Epi Type _ _ _ (λ g : c ⟶  x ↦ g ≫ f)) := sorry
-lemma split_mono_postcomp : IsSplitMono f ↔  (∀ c, @Epi Type _ _ _ (λ g : y ⟶  c ↦ f ≫ g)) := sorry
+lemma split_epi_postcomp  : IsSplitEpi  f ↔  (∀ c, @Epi (Type u) _ _ _ (λ g : c ⟶  x ↦ g ≫ f)) := sorry
+lemma split_mono_postcomp : IsSplitMono f ↔  (∀ c, @Epi (Type u) _ _ _ (λ g : y ⟶  c ↦ f ≫ g)) := sorry
 
 end isocomp
 
 -- exercise 1.2.v
 -- pain in the ass bundling, meta here???
-example : Mono (RingCat.ofHom (Int.castRingHom ℚ)) := by
-  sorry
-
-example : Epi (RingCat.ofHom (Int.castRingHom ℚ)) := by
-  sorry
+lemma mono_int_cast_rat : Mono (RingCat.ofHom (Int.castRingHom ℚ)) := sorry
+lemma epi_int_cat_cat   : Epi  (RingCat.ofHom (Int.castRingHom ℚ))    := sorry
 
 -- lemma 1.3.8
-lemma iso_functor {C D : Type} [Category C] [Category D] (F : C ⥤ D) {x y : C} (f : x ⟶  y) : IsIso f → IsIso (F.map f) := by
+lemma iso_functor {C : Type u} {D : Type v} [Category C] [Category D] (F : C ⥤ D) {x y : C} (f : x ⟶  y) : IsIso f → IsIso (F.map f) := by
   intros h
   have ⟨g, ⟨l, r⟩⟩ := h
   exists F.map g
@@ -102,3 +102,32 @@ lemma iso_functor {C D : Type} [Category C] [Category D] (F : C ⥤ D) {x y : C}
     rw [←l,CategoryTheory.Functor.map_comp]
   case right =>
     rw [←r, CategoryTheory.Functor.map_comp]
+
+
+-- definition 1.3.11
+def postcomp {C : Type u} [Category.{v} C] (c : C) : C ⥤ Type v where
+  obj (x : C) := c ⟶  x
+  map {x y} (f : x ⟶  y) := (· ≫ f)
+
+def precomp {C : Type u} [Category.{v} C] (c : C) : Cᵒᵖ ⥤ Type v where
+  obj (x : Cᵒᵖ) := x.unop ⟶  c
+  map {x y} (f : x ⟶  y) := (f.unop ≫ ·)
+
+-- definition 1.3.13
+-- same as `CategoryTheory.Functor.hom`, but with some annotations (that might cause defeq issues?)
+def two_sided_rep {C : Type u} [Category.{v} C] : Cᵒᵖ × C ⥤ Type v where
+  obj := λ (x, y) ↦ x.unop ⟶  y
+  map {X Y : Cᵒᵖ × C} := 
+    let (w, y) := X
+    let (x, z) := Y
+    λ ((f : w ⟶  x), (h : y ⟶  z)) (g : w.unop ⟶  y) ↦ f.unop ≫ g ≫ h
+
+-- easier versions (in one direction) of iso_{pre,post}comp from above
+lemma iso_postcomp_forward {C : Type} [Category C] {x y : C} (f : x ⟶  y) (h : IsIso f) (c : C) 
+  : @IsIso (Type u) _ _ _ (λ h : c ⟶  x ↦ h ≫ f) := iso_functor (postcomp c) f h
+
+lemma iso_precomp_forward {C : Type} [Category C] {x y : Cᵒᵖ} (f : x ⟶  y) (h : IsIso f.op) (c : Cᵒᵖ) 
+  : @IsIso (Type u) _ _ _ (λ g : y ⟶  c ↦ f ≫ g) := iso_functor (precomp c) _ h
+
+-- exercise 1.4.v
+def postcomp_trans {C : Type} [Category C] {c d : C} (f g : c ⟶  d) : NatTrans (postcomp c) (postcomp d) := sorry
