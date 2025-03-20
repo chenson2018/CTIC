@@ -129,5 +129,4 @@ lemma iso_postcomp_forward {C : Type} [Category C] {x y : C} (f : x ⟶  y) (h :
 lemma iso_precomp_forward {C : Type} [Category C] {x y : Cᵒᵖ} (f : x ⟶  y) (h : IsIso f.op) (c : Cᵒᵖ) 
   : @IsIso (Type u) _ _ _ (λ g : y ⟶  c ↦ f ≫ g) := iso_functor (precomp c) _ h
 
--- exercise 1.4.v
-def postcomp_trans {C : Type} [Category C] {c d : C} (f g : c ⟶  d) : NatTrans (postcomp c) (postcomp d) := sorry
+-- TODO: example 1.4.7
