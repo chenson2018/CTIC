@@ -91,3 +91,14 @@ example : Mono (RingCat.ofHom (Int.castRingHom ℚ)) := by
 
 example : Epi (RingCat.ofHom (Int.castRingHom ℚ)) := by
   sorry
+
+-- lemma 1.3.8
+lemma iso_functor {C D : Type} [Category C] [Category D] (F : C ⥤ D) {x y : C} (f : x ⟶  y) : IsIso f → IsIso (F.map f) := by
+  intros h
+  have ⟨g, ⟨l, r⟩⟩ := h
+  exists F.map g
+  apply And.intro <;> rw [←CategoryTheory.Functor.map_id]
+  case left =>
+    rw [←l,CategoryTheory.Functor.map_comp]
+  case right =>
+    rw [←r, CategoryTheory.Functor.map_comp]
