@@ -8,7 +8,7 @@ open CategoryTheory
 
 -- example 1.1.10
 open Function in
-example (X Y : Type) (f : X → Y) : Bijective f ↔ @IsIso Type _ _ _ f := by
+lemma bijective_iff_iso (X Y : Type) (f : X → Y) : Bijective f ↔ @IsIso Type _ _ _ f := by
   apply Iff.intro <;> intros h 
   case mp =>
     -- there's weirdness about the defeq of the bundling, but this is the idea...
@@ -33,16 +33,31 @@ example (X Y : Type) (f : X → Y) : Bijective f ↔ @IsIso Type _ _ _ f := by
       exact congrFun r
 
 -- exercise 1.1.i.i
--- TODO: write this in calc style
-example (C : Type) [Category C] (X Y : C) (α α' : Iso X Y) (h : α.hom = α'.hom) : α.inv = α'.inv := by
+lemma iso_unique (C : Type) [Category C] (X Y : C) (α α' : Iso X Y) (h : α.hom = α'.hom) : α.inv = α'.inv := by
   obtain ⟨f , g , l , r ⟩ := α
   obtain ⟨f', g', l', r'⟩ := α'
   simp_all
-  sorry
+  calc
+    g = g ≫  𝟙 X      := Eq.symm (Category.comp_id g)
+    _ = g ≫  f' ≫ g'  := congrArg (CategoryStruct.comp g) (id (Eq.symm l'))
+    _ = g ≫  f ≫ g'   := by rw [h]
+    _ = (g ≫  f) ≫ g' := Eq.symm (Category.assoc g f g')
+    _ = (𝟙 Y) ≫ g'    := by rw [r]
+    _ = g'            := Category.id_comp g'
 
 -- exercise 1.1.i.ii
-example (C : Type) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶  X) (H : f ≫  g = 𝟙 X) (H' : h ≫ f = 𝟙 Y) : g = h := by
-  sorry      
+lemma inverses_eq (C : Type) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶  X) (H : f ≫  g = 𝟙 X) (H' : h ≫ f = 𝟙 Y) : g = h := by
+  calc
+    g = 𝟙 Y ≫ g     := Eq.symm (Category.id_comp g)
+    _ = (h ≫ f) ≫ g := by rw [H']
+    _ = h ≫ f ≫ g   := Category.assoc h f g
+    _ = h ≫ 𝟙 X     := by rw [H]
+    _ = h           := Category.comp_id h
+
+lemma inverses_iso (C : Type) [Category C] (X Y : C) (f : X ⟶  Y) (g h : Y ⟶  X) (H : f ≫  g = 𝟙 X) (H' : h ≫ f = 𝟙 Y) : IsIso f := by
+  exists h
+  rw [inverses_eq C X Y f g h H H'] at H
+  exact ⟨H, H'⟩
 
 section isocomp
 
