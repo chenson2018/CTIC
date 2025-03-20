@@ -8,7 +8,7 @@ open CategoryTheory
 
 -- example 1.1.10
 open Function in
-lemma bijective_iff_iso (X Y : Type) (f : X → Y) : Bijective f ↔ @IsIso Type _ _ _ f := by
+lemma bijective_iff_iso {X Y : Type} (f : X → Y) : Bijective f ↔ @IsIso Type _ _ _ f := by
   apply Iff.intro <;> intros h 
   case mp =>
     -- there's weirdness about the defeq of the bundling, but this is the idea...
@@ -65,7 +65,16 @@ variable {α : Type} [C : Category α] {x y : α} (f : x ⟶  y)
 
 -- lemma 1.2.3
 -- chance to try duality....
-lemma iso_postcomp : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ g : c ⟶  x ↦ g ≫ f)) := sorry
+lemma iso_postcomp : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ g : c ⟶  x ↦ g ≫ f)) := by
+  apply Iff.intro <;> intros h
+  case mp =>
+    have ⟨g, ⟨l, r⟩⟩ := h
+    intros c
+    exists (· ≫ g)
+    apply And.intro <;> ext <;> simp [l, r, Category.comp_id]
+  case mpr => 
+    sorry
+
 lemma iso_precomp  : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ g : y ⟶  c ↦ f ≫ g)) := sorry
 
 -- exercise 1.2.ii
