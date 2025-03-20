@@ -65,7 +65,7 @@ variable {α : Type} [C : Category α] {x y : α} (f : x ⟶  y)
 
 -- lemma 1.2.3
 -- chance to try duality....
-lemma iso_postcomp : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ g : c ⟶  x ↦ g ≫ f)) := by
+lemma iso_postcomp : IsIso f ↔ (∀ c, @IsIso Type _ _ _ (λ h : c ⟶  x ↦ h ≫ f)) := by
   apply Iff.intro <;> intros h
   case mp =>
     have ⟨g, ⟨l, r⟩⟩ := h
