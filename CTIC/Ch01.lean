@@ -129,4 +129,19 @@ lemma iso_postcomp_forward {C : Type} [Category C] {x y : C} (f : x ⟶  y) (h :
 lemma iso_precomp_forward {C : Type} [Category C] {x y : Cᵒᵖ} (f : x ⟶  y) (h : IsIso f.op) (c : Cᵒᵖ) 
   : @IsIso (Type u) _ _ _ (λ g : y ⟶  c ↦ f ≫ g) := iso_functor (precomp c) _ h
 
--- TODO: example 1.4.7
+-- example 1.4.7
+def postcomp_trans {C : Type u} [Category.{v} C] {w x: C} (f : w ⟶  x) : NatTrans (postcomp x) (postcomp w) where
+  app (c : C) := precomp c |>.map f.op
+  naturality:= by
+    simp [postcomp, precomp]
+    intros
+    ext
+    simp  
+
+def precomp_trans {C : Type u} [Category.{v} C] {y z: C} (h : y ⟶  z) : NatTrans (precomp y) (precomp z) where
+  app (c : Cᵒᵖ) := postcomp c.unop |>.map h
+  naturality := by
+    simp [postcomp, precomp]
+    intros
+    ext
+    simp
